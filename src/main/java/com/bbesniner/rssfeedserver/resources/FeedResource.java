@@ -1,7 +1,7 @@
 package com.bbesniner.rssfeedserver.resources;
 
-import com.bbesniner.rssfeedserver.hibernateentities.Feed;
-import com.bbesniner.rssfeedserver.requestbodyentities.Url;
+import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
+import com.bbesniner.rssfeedserver.entities.requestbody.Url;
 import com.bbesniner.rssfeedserver.services.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

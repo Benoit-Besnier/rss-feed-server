@@ -1,6 +1,6 @@
 package com.bbesniner.rssfeedserver.services;
 
-import com.bbesniner.rssfeedserver.hibernateentities.Feed;
+import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.repositories.FeedRepository;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;

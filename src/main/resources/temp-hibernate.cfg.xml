@@ -22,7 +22,7 @@
     <property name="hibernate.hbm2ddl.auto">create-drop</property>
 
     <!-- Annotated entity classes -->
-    <mapping class="com.bbesniner.rssfeedserver.hibernateentities.AppUser"/>
+    <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.User"/>
 
 </session-factory>
 </hibernate-configuration>

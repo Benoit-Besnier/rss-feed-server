@@ -1,13 +1,11 @@
-package com.bbesniner.rssfeedserver.hibernateentities;
+package com.bbesniner.rssfeedserver.entities.hibernate;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "feeds")
 @Setter @Getter
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
