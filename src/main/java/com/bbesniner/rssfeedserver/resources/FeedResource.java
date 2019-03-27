@@ -1,7 +1,7 @@
 package com.bbesniner.rssfeedserver.resources;
 
-import com.bbesniner.rssfeedserver.hibernateentities.Feed;
-import com.bbesniner.rssfeedserver.requestbodyentities.Url;
+import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
+import com.bbesniner.rssfeedserver.entities.requestbody.FeedCandidate;
 import com.bbesniner.rssfeedserver.services.FeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class FeedResource {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Feed> findOneByName(@PathVariable("id") final Long id) {
+    public ResponseEntity<Feed> findOneById(@PathVariable("id") final Long id) {
         try {
             return ResponseEntity.ok(this.feedService.findOneById(id));
         } catch (Exception e) {
@@ -34,9 +34,9 @@ public class FeedResource {
     }
 
     @PostMapping()
-    public ResponseEntity create(@RequestBody final Url url) {
+    public ResponseEntity create(@RequestBody final FeedCandidate feedCandidate) {
         try {
-            this.feedService.createFromUrl(url.getUrl());
+            this.feedService.createFromUrl(feedCandidate.getUrl());
         } catch (Exception e) {
             // TODO : Should not be generic Exception
             e.printStackTrace();
@@ -48,14 +48,9 @@ public class FeedResource {
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity delete(@PathVariable("id") final Long id) {
-        try {
-            this.feedService.deleteOneById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO : Adapt error code depending of root cause
-            return ResponseEntity.status(500).build();
-        }
-        return ResponseEntity.ok().build();
+        this.feedService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
