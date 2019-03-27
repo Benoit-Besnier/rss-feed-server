@@ -1,15 +1,18 @@
 package com.bbesniner.rssfeedserver.entities.hibernate;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "feeds")
-@Setter @Getter
+@Builder
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
-@Builder
 public class Feed {
 
     @Id
@@ -17,12 +20,15 @@ public class Feed {
     private Long id;
 
     @Column(unique = true, nullable = false)
+    @NotEmpty
     private String title;
 
-    private String description;
+    @NotEmpty
+    private String link;
 
     @Column(length = 1024)
     private String copyright;
 
-    private String link;
+    private String description;
+
 }
