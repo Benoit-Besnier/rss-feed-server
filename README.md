@@ -8,7 +8,7 @@ This API can be started with Maven or using IntelliJ.
 
 ##### Some notes
 
-Routes notified with [Secured] require a valid JWT token inside the header request.
+Routes notified with `[Secured]` require a valid JWT token inside the header request.
 
 Here an example: 
 ```
@@ -44,7 +44,8 @@ Return (ex):
 ``` 
  
 #### ROUTES `/users`
- - GET `/me` [Secured] => Return information of current user
+ - GET `/me` `[Secured]` => Return information of current user
+ 
 Return (ex):
 ```json
   {
