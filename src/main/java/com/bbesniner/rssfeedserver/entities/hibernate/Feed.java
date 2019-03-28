@@ -1,9 +1,6 @@
 package com.bbesniner.rssfeedserver.entities.hibernate;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -11,6 +8,7 @@ import javax.validation.constraints.NotEmpty;
 @Entity
 @Table(name = "feeds")
 @Builder
+@Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 public class Feed {

@@ -25,7 +25,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(final String... args) throws Exception {
+    public void run(final String... args) {
 
         log.debug("initializing feeds data...");
 
@@ -44,7 +44,7 @@ public class DataInitializer implements CommandLineRunner {
                 .build());
 
         log.debug("printing all feeds...");
-        this.feedRepository.findAll().forEach(v -> log.debug(" Feed :" + v.toString()));
+        this.feedRepository.findAll().forEach(feed -> log.debug(" Feed :" + feed.toString()));
 
         log.debug("initializing users data...");
 
@@ -61,6 +61,6 @@ public class DataInitializer implements CommandLineRunner {
                 .build());
 
         log.debug("printing all userRepository...");
-        this.userRepository.findAll().forEach(v -> log.debug(" User :" + v.toString()));
+        this.userRepository.findAll().forEach(user -> log.debug(" User :" + user.toString()));
     }
 }

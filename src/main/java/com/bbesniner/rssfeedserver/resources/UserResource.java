@@ -1,5 +1,6 @@
 package com.bbesniner.rssfeedserver.resources;
 
+import com.bbesniner.rssfeedserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,9 +15,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(UserResource.PATH)
 @RequiredArgsConstructor
 public class UserResource {
+
+    static final String PATH = "/users";
+
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails) {

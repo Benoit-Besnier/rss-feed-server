@@ -4,6 +4,7 @@ import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.entities.requestbody.FeedCandidate;
 import com.bbesniner.rssfeedserver.services.FeedService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +15,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedResource {
 
+//    static final String PATH =;
+
     private final FeedService feedService;
 
     @GetMapping
     public ResponseEntity<List<Feed>> findAll() {
-        return ResponseEntity.ok(this.feedService.findAll());
+        List<Feed> feeds = this.feedService.findAll();
+
+        return new ResponseEntity<>(feeds, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")

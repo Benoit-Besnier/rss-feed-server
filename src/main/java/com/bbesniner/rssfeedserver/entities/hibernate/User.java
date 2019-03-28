@@ -21,7 +21,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @NotEmpty
