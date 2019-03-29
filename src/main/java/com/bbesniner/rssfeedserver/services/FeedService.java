@@ -30,17 +30,17 @@ public class FeedService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public void createFromUrl(final String url) throws FeedException {
+    public Feed createFromUrl(final String url) {
         final Feed feed = this.parseFeedFromTargetUrl(url);
 
-        this.feedRepository.save(feed);
+        return this.feedRepository.save(feed);
     }
 
     public void deleteById(final Long id) {
         this.feedRepository.deleteById(id);
     }
 
-    private Feed parseFeedFromTargetUrl(final String feedUrl) throws FeedException {
+    private Feed parseFeedFromTargetUrl(final String feedUrl) {
         final SyndFeed parsedFeed = this.fetchFeed(feedUrl);
 
         return Feed.builder()

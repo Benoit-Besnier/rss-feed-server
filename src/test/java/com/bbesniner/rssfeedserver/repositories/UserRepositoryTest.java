@@ -29,5 +29,4 @@ public class UserRepositoryTest {
         assertEquals(foundUser.getId(), savedUser.getId());
     }
 
-
 }

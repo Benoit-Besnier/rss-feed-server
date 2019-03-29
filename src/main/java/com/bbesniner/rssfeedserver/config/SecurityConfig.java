@@ -5,6 +5,7 @@ import com.bbesniner.rssfeedserver.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,9 +33,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizeRequests()
                     // TODO : Access authorization should be set once API is mostly done
                     .antMatchers("/auth/**").permitAll()
-                    .antMatchers("/feeds/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/feeds/**").permitAll()
+                    .antMatchers(HttpMethod.POST, "/feeds/**").authenticated()
+                    .antMatchers(HttpMethod.DELETE, "/feeds/**").hasRole("ADMIN")
                     //.antMatchers(HttpMethod.GET, "/feeds/**").permitAll()
-                    //.antMatchers(HttpMethod.DELETE, "/feeds/**").authenticated()
+                    //.antMatchers(HttpMethod.DELETE, "/feeds/**").hasRole("ADMIN")
 //                  .antMatchers(HttpMethod.GET, "/feeds/whatever/**").permitAll()
                     .anyRequest().authenticated()
                 .and()

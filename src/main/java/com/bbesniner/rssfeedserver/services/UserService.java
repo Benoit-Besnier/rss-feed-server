@@ -2,7 +2,7 @@ package com.bbesniner.rssfeedserver.services;
 
 import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
 import com.bbesniner.rssfeedserver.entities.hibernate.User;
-import com.bbesniner.rssfeedserver.entities.requestbody.AuthenticationRequest;
+import com.bbesniner.rssfeedserver.entities.requestbody.UserCredentials;
 import com.bbesniner.rssfeedserver.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,10 +28,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User <" + username + "> cannot be found"));
     }
 
-    public User createUser(final AuthenticationRequest authenticationRequest) throws CreateConflictException {
+    public User createUser(final UserCredentials userCredentials) throws CreateConflictException {
         final User user = User.builder()
-                .username(authenticationRequest.getUsername())
-                .password(authenticationRequest.getPassword())
+                .username(userCredentials.getUsername())
+                .password(userCredentials.getPassword())
                 .build();
 
         if (!this.userRepository.findByUsername(user.getUsername()).isPresent()) {

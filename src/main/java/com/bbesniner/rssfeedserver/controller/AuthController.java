@@ -1,8 +1,8 @@
-package com.bbesniner.rssfeedserver.resources;
+package com.bbesniner.rssfeedserver.controller;
 
 import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
 import com.bbesniner.rssfeedserver.entities.hibernate.User;
-import com.bbesniner.rssfeedserver.entities.requestbody.AuthenticationRequest;
+import com.bbesniner.rssfeedserver.entities.requestbody.UserCredentials;
 import com.bbesniner.rssfeedserver.security.jwt.JwtTokenProvider;
 import com.bbesniner.rssfeedserver.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,16 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(AuthResource.PATH)
+@RequestMapping(AuthController.PATH)
 @RequiredArgsConstructor
-public class AuthResource {
+public class AuthController {
 
     static final String PATH = "/auth";
 
@@ -36,7 +38,7 @@ public class AuthResource {
     private final UserService userService;
 
     @PostMapping("/signin")
-    public ResponseEntity signIn(@RequestBody AuthenticationRequest data) {
+    public ResponseEntity signIn(@RequestBody final UserCredentials data) {
         final Map<String, String> model = new HashMap<>();
 
         try {
@@ -55,10 +57,16 @@ public class AuthResource {
     }
 
     @PostMapping("/register")
-    public ResponseEntity createUser(@RequestBody final AuthenticationRequest request)
+    public ResponseEntity createUser(@RequestBody final UserCredentials userCredentials,
+                                     final HttpServletRequest request)
             throws CreateConflictException, URISyntaxException {
-        final User user = this.userService.createUser(request);
+        final User saved = this.userService.createUser(userCredentials);
+        final URI location = ServletUriComponentsBuilder
+                .fromContextPath(request)
+                .path(FeedController.PATH + "/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
 
-        return ResponseEntity.created(new URI(UserResource.PATH + "/" + user.getId())).build();
+        return ResponseEntity.created(location).build();
     }
 }
