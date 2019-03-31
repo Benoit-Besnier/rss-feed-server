@@ -18,15 +18,15 @@ curl -X GET\
 ```
 
 #### ROUTES `/feeds`
- - GET /feeds => Return all feeds already registered
- - GET /feeds/{id} => Return feed with selected {id}
- - POST /feeds => Save feedCandidate found in request body
- - DELETE /feeds/{id} => Remove feed with selected {id}
+ - GET `/feeds` => Return all feeds already registered
+ - GET `/feeds/{id}` => Return feed with selected {id}
+ - POST `/feeds` `[Secured]` => Save feedCandidate found in request body
+ - DELETE `/feeds/{id}` `[Secured ADMIN]` => Remove feed with selected {id}
 
 >  NO Update available -> By default, rss are regularly updated
 
 #### ROUTES `/auth`
- - POST `/signin` => Connect to an account
+ - POST `/auth/signin` => Connect to an account
 
 Wait for :
  ```json
@@ -42,9 +42,18 @@ Return (ex):
     "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTU1MzcxOTU4NiwiZXhwIjoxNTUzNzIzMTg2fQ.cqQsZ30B_WeV-Ia4PiCCzPTvhZBu4eklAGhjvWZsmbQ"
   }
 ``` 
+
+ - POST `/auth/register` => Create a new account
+ 
+ ```json
+  {
+    "username": "test",
+    "password": "some-really-heavy_password"
+  }
+ ```
  
 #### ROUTES `/users`
- - GET `/me` `[Secured]` => Return information of current user
+ - GET `/users/me` `[Secured]` => Return information of current user
  
 Return (ex):
 ```json
