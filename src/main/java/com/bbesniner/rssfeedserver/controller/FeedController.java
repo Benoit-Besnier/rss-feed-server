@@ -1,4 +1,4 @@
-package com.bbesniner.rssfeedserver.resources;
+package com.bbesniner.rssfeedserver.controller;
 
 import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.entities.requestbody.FeedCandidate;
@@ -7,19 +7,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/feeds")
+@RequestMapping(FeedController.PATH)
 @RequiredArgsConstructor
-public class FeedResource {
+public class FeedController {
 
-//    static final String PATH =;
+    static final String PATH = "/feeds";
 
     private final FeedService feedService;
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<List<Feed>> findAll() {
         List<Feed> feeds = this.feedService.findAll();
 
@@ -28,27 +31,19 @@ public class FeedResource {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Feed> findOneById(@PathVariable("id") final Long id) {
-        try {
-            return ResponseEntity.ok(this.feedService.findOneById(id));
-        } catch (Exception e) {
-            // TODO : Should not be generic Exception
-            e.printStackTrace();
-            // TODO : Adapt error code depending of root cause
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(this.feedService.findOneById(id));
     }
 
-    @PostMapping()
-    public ResponseEntity create(@RequestBody final FeedCandidate feedCandidate) {
-        try {
-            this.feedService.createFromUrl(feedCandidate.getUrl());
-        } catch (Exception e) {
-            // TODO : Should not be generic Exception
-            e.printStackTrace();
-            // TODO : Adapt error code depending of root cause
-            return ResponseEntity.status(500).build();
-        }
-        return ResponseEntity.ok().build();
+    @PostMapping("")
+    public ResponseEntity create(@RequestBody final FeedCandidate feedCandidate, final HttpServletRequest request) {
+        final Feed saved = this.feedService.createFromUrl(feedCandidate.getUrl());
+        final URI location = ServletUriComponentsBuilder
+                .fromContextPath(request)
+                .path(FeedController.PATH + "/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 
     @DeleteMapping(value = "/{id}")

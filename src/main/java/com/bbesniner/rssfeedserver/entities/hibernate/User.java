@@ -20,8 +20,7 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
+    @GeneratedValue()
     private Long id;
 
     @NotEmpty
