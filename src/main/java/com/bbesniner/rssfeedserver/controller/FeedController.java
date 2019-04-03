@@ -1,5 +1,6 @@
 package com.bbesniner.rssfeedserver.controller;
 
+import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
 import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.entities.requestbody.FeedCandidate;
 import com.bbesniner.rssfeedserver.services.FeedService;
@@ -35,8 +36,9 @@ public class FeedController {
     }
 
     @PostMapping("")
-    public ResponseEntity create(@RequestBody final FeedCandidate feedCandidate, final HttpServletRequest request) {
-        final Feed saved = this.feedService.createFromUrl(feedCandidate.getUrl());
+    public ResponseEntity create(@RequestBody final FeedCandidate feedCandidate, final HttpServletRequest request)
+            throws CreateConflictException {
+        final Feed saved = this.feedService.createFromSourceUrl(feedCandidate.getUrl());
         final URI location = ServletUriComponentsBuilder
                 .fromContextPath(request)
                 .path(FeedController.PATH + "/{id}")
@@ -52,5 +54,4 @@ public class FeedController {
 
         return ResponseEntity.noContent().build();
     }
-
 }
