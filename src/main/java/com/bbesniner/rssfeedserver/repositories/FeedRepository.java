@@ -9,8 +9,10 @@ import java.util.Optional;
 @Repository
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
-    Optional<Feed> findById(final Long id);
+    Optional<Feed> findByUuid(final String uuid);
 
-    Optional<Feed> findByLink(final String link);
+    Optional<Feed> findBySourceFeedUrl(final String sourceFeedUrl);
+
+    void deleteByUuid(final String uuid);
 
 }

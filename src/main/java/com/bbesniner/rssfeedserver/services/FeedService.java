@@ -1,7 +1,7 @@
 package com.bbesniner.rssfeedserver.services;
 
 import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
-import com.bbesniner.rssfeedserver.entities.exceptions.UserNotFoundException;
+import com.bbesniner.rssfeedserver.entities.exceptions.ResourceNotFound;
 import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.repositories.FeedRepository;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -9,14 +9,18 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedService {
@@ -29,23 +33,35 @@ public class FeedService {
         return this.feedRepository.findAll();
     }
 
-    public Feed findOneById(final Long id) {
-        return this.feedRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public Feed findOneById(final String uuid) {
+        return this.feedRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ResourceNotFound(uuid, Feed.class));
     }
 
     public Feed createFromSourceUrl(final String url) throws CreateConflictException {
         final Feed feed = this.parseFeedFromTargetUrl(url);
 
-        if (!this.feedRepository.findByLink(feed.getLink()).isPresent()) {
+        if (!this.feedRepository.findBySourceFeedUrl(url).isPresent()) {
+            feed.setSourceFeedUrl(url);
+            feed.setUuid(this.generateNewUuid());
+
             return this.feedRepository.save(feed);
         } else {
             throw new CreateConflictException("Cannot create " + feed.getLink() + " because it already exist.");
         }
     }
 
-    public void deleteById(final Long id) {
-        this.feedRepository.deleteById(id);
+    private String generateNewUuid() {
+        String uuid = UUID.randomUUID().toString();
+
+        if (!this.feedRepository.findByUuid(uuid).isPresent())
+            return uuid;
+        else
+            return this.generateNewUuid();
+    }
+
+    public void deleteByUuid(final String uuid) {
+        this.feedRepository.deleteByUuid(uuid);
     }
 
     private Feed parseFeedFromTargetUrl(final String feedUrl) {
@@ -57,7 +73,6 @@ public class FeedService {
     private Feed convertToDTO(SyndFeed parsedFeed) {
         return this.modelMapper.map(parsedFeed, Feed.class);
     }
-
 
     private SyndFeed fetchFeed(final String feedUrl) {
         final RestTemplate restTemplate = new RestTemplate();
@@ -72,4 +87,31 @@ public class FeedService {
         });
     }
 
+    public void updateFeed(final Map.Entry<Feed, Feed> feedEntry) {
+        final Feed source = feedEntry.getKey();
+        final Feed toUpdate = feedEntry.getValue();
+
+        toUpdate.setUuid(source.getUuid());
+        toUpdate.setSourceFeedUrl(source.getSourceFeedUrl());
+        toUpdate.setAutoUpdatedDate(new Date());
+        this.feedRepository.save(toUpdate);
+    }
+
+    @Scheduled(fixedDelay = 300000)
+    public void updateFeed() {
+        final long startTime = System.currentTimeMillis();
+
+        final List<Feed> feedList = this.feedRepository.findAll();
+        final Map<Feed, Feed> feedMap = new HashMap<>();
+
+        for (final Feed feed : feedList) {
+            feedMap.put(feed, this.convertToDTO(this.fetchFeed(feed.getSourceFeedUrl())));
+        }
+
+        feedMap.entrySet().forEach(this::updateFeed);
+
+        log.info("New task executed at {} and take {} ms to be executed",
+                Date.from(Instant.ofEpochMilli(startTime)),
+                System.currentTimeMillis() - startTime);
+    }
 }

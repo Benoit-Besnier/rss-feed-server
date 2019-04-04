@@ -30,19 +30,19 @@ public class DataInitializer implements CommandLineRunner {
         log.debug("initializing feeds data...");
 
         this.feedRepository.save(Feed.builder()
-                .id(10000L)
-                .link("lien-premier")
-                .uri("lien-premier")
-                .title("Test_premier")
-                .description("le premier test")
+                .uuid("fe8e5858-ab8b-42bb-ba66-d109296d2654")
+                .sourceFeedUrl("http://www.leparisien.fr/actualites-a-la-une.rss.xml")
+                .link("http://www.leparisien.fr")
+                .title("Le Parisien - l'actu")
+                .description("Le feed du 'Le Parisien' comme example.")
                 .build());
 
         this.feedRepository.save(Feed.builder()
-                .id(20000L)
-                .link("go-to-2")
-                .uri("lien-second")
-                .title("Test-2")
-                .description("Et ça c est le second")
+                .uuid("fb55615d-3c7c-472c-80b9-d7ecba8fb0e4")
+                .sourceFeedUrl("http://feeds.bbci.co.uk/news/world/rss.xml")
+                .link("https://www.bbc.co.uk/news/")
+                .title("BBC News - World")
+                .description("Un feed de la 'BBC News' sur leur channel 'World'")
                 .build());
 
         log.debug("printing all feeds...");

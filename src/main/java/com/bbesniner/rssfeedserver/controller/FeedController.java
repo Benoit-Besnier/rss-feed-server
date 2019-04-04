@@ -30,9 +30,9 @@ public class FeedController {
         return new ResponseEntity<>(feeds, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<Feed> findOneById(@PathVariable("id") final Long id) {
-        return ResponseEntity.ok(this.feedService.findOneById(id));
+    @GetMapping(value = "/{uuid}")
+    public ResponseEntity<Feed> findOneById(@PathVariable("uuid") final String uuid) {
+        return ResponseEntity.ok(this.feedService.findOneById(uuid));
     }
 
     @PostMapping("")
@@ -41,16 +41,16 @@ public class FeedController {
         final Feed saved = this.feedService.createFromSourceUrl(feedCandidate.getUrl());
         final URI location = ServletUriComponentsBuilder
                 .fromContextPath(request)
-                .path(FeedController.PATH + "/{id}")
-                .buildAndExpand(saved.getId())
+                .path(FeedController.PATH + "/{uuid}")
+                .buildAndExpand(saved.getUuid())
                 .toUri();
 
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity delete(@PathVariable("id") final Long id) {
-        this.feedService.deleteById(id);
+    @DeleteMapping(value = "/{uuid}")
+    public ResponseEntity delete(@PathVariable("uuid") final String uuid) {
+        this.feedService.deleteByUuid(uuid);
 
         return ResponseEntity.noContent().build();
     }
