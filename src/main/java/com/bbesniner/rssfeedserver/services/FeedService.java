@@ -1,5 +1,6 @@
 package com.bbesniner.rssfeedserver.services;
 
+import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
 import com.bbesniner.rssfeedserver.entities.exceptions.UserNotFoundException;
 import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.repositories.FeedRepository;
@@ -8,6 +9,7 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +23,8 @@ public class FeedService {
 
     private final FeedRepository feedRepository;
 
+    private final ModelMapper modelMapper;
+
     public List<Feed> findAll() {
         return this.feedRepository.findAll();
     }
@@ -30,10 +34,14 @@ public class FeedService {
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public Feed createFromUrl(final String url) {
+    public Feed createFromSourceUrl(final String url) throws CreateConflictException {
         final Feed feed = this.parseFeedFromTargetUrl(url);
 
-        return this.feedRepository.save(feed);
+        if (!this.feedRepository.findByLink(feed.getLink()).isPresent()) {
+            return this.feedRepository.save(feed);
+        } else {
+            throw new CreateConflictException("Cannot create " + feed.getLink() + " because it already exist.");
+        }
     }
 
     public void deleteById(final Long id) {
@@ -43,13 +51,13 @@ public class FeedService {
     private Feed parseFeedFromTargetUrl(final String feedUrl) {
         final SyndFeed parsedFeed = this.fetchFeed(feedUrl);
 
-        return Feed.builder()
-                .title(parsedFeed.getTitle())
-                .link(parsedFeed.getLink())
-                .copyright(parsedFeed.getCopyright())
-                .description(parsedFeed.getDescription())
-                .build();
+        return this.convertToDTO(parsedFeed);
     }
+
+    private Feed convertToDTO(SyndFeed parsedFeed) {
+        return this.modelMapper.map(parsedFeed, Feed.class);
+    }
+
 
     private SyndFeed fetchFeed(final String feedUrl) {
         final RestTemplate restTemplate = new RestTemplate();

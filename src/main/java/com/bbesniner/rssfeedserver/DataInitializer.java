@@ -31,15 +31,17 @@ public class DataInitializer implements CommandLineRunner {
 
         this.feedRepository.save(Feed.builder()
                 .id(10000L)
-                .title("Test_premier")
                 .link("lien-premier")
+                .uri("lien-premier")
+                .title("Test_premier")
                 .description("le premier test")
                 .build());
 
         this.feedRepository.save(Feed.builder()
                 .id(20000L)
-                .title("Test-2")
                 .link("go-to-2")
+                .uri("lien-second")
+                .title("Test-2")
                 .description("Et ça c est le second")
                 .build());
 

@@ -23,7 +23,7 @@ public class UserRepositoryTest {
         final User foundUser = this.userRepository.getOne(savedUser.getId());
 
         assertEquals(foundUser.getUsername(), user.getUsername());
-        assertEquals(foundUser.getPassword(), foundUser.getPassword());
+        assertEquals(foundUser.getPassword(), user.getPassword());
         assertNotNull(foundUser.getId());
         assertTrue(foundUser.getId() > 0);
         assertEquals(foundUser.getId(), savedUser.getId());

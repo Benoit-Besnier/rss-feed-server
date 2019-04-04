@@ -8,28 +8,23 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "feeds")
+@Table(name = "entries")
 @Builder
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-@EqualsAndHashCode(of = {"id"})
-public class Feed {
+@EqualsAndHashCode(of = {"link"})
+public class Entry {
 
-    @Id
     @GeneratedValue
     private Long id;
 
-    @NotEmpty
-    private String title;
+    @ManyToOne
+    private Feed feed;
 
+    @Id
     @NotEmpty
     @Column(unique = true, nullable = false)
     private String link;
-
-    @Column(length = 1024)
-    private String copyright;
-
-    private String description;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Person> authors;
@@ -37,46 +32,35 @@ public class Feed {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories;
 
+    private String comments;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Person> contributors;
+
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Content> contents;
 //
-//    private Content descriptionEx;
-//
-//    private String docs;
-//
-    private String encoding;
+//    private Content description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Entry> entries;
-
-    private String feedType;
-
-    private String generator;
-
-//    private Image icon;
-//
-//    private Image image;
-
-    private String language;
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Enclosure> enclosures;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Link> links;
 
-//    private String managingEditor;
-//
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Module> modules;
 
     private Date publishedDate;
 
-    private String styleSheet;
+    private String title;
 
-//    private List<String> supportedFeedTypes;
-//
 //    private Content titleEx;
+
+    private Date updatedDate;
 
     private String uri;
 
-    private String webMaster;
+//    private Object wireEntry;
 
 }
