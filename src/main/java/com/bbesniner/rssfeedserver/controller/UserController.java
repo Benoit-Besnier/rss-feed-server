@@ -50,7 +50,7 @@ public class UserController {
                                            @RequestBody final PreferredFeeds preferredFeeds) throws ResourceNotFound {
         List<String> feedsUuid = this.feedService.findAll().stream()
                 .map(Feed::getUuid)
-                .filter(uuid -> preferredFeeds.getPreferredFeedsUuid().contains(uuid))
+                .filter(uuid -> preferredFeeds.getPreferredFeeds().contains(uuid))
                 .collect(Collectors.toList());
 
         this.userService.updatePreferredFeeds(userDetails.getUsername(), feedsUuid);
