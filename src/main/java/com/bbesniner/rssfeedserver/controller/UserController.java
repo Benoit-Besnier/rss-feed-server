@@ -1,15 +1,20 @@
 package com.bbesniner.rssfeedserver.controller;
 
+import com.bbesniner.rssfeedserver.entities.exceptions.ResourceNotFound;
+import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
+import com.bbesniner.rssfeedserver.entities.hibernate.User;
+import com.bbesniner.rssfeedserver.entities.requestbody.PreferredFeeds;
+import com.bbesniner.rssfeedserver.services.FeedService;
+import com.bbesniner.rssfeedserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,9 +25,14 @@ public class UserController {
 
     static final String PATH = "/users";
 
+    private final UserService userService;
+
+    private final FeedService feedService;
+
     @GetMapping("/me")
-    public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity currentUser(@AuthenticationPrincipal final UserDetails userDetails) throws ResourceNotFound {
         final Map<Object, Object> userInformation = new HashMap<>();
+        final User user = this.userService.findByUsername(userDetails.getUsername());
 
         userInformation.put("username", userDetails.getUsername());
         userInformation.put("roles", userDetails.getAuthorities()
@@ -30,7 +40,21 @@ public class UserController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList())
         );
+        userInformation.put("preferredFeeds", user.getPreferredFeedUuid());
+
         return ResponseEntity.ok(userInformation);
+    }
+
+    @PutMapping("/me/feeds")
+    public ResponseEntity setPreferredFeed(@AuthenticationPrincipal final UserDetails userDetails,
+                                           @RequestBody final PreferredFeeds preferredFeeds) throws ResourceNotFound {
+        List<String> feedsUuid = this.feedService.findAll().stream()
+                .map(Feed::getUuid)
+                .filter(uuid -> preferredFeeds.getPreferredFeedsUuid().contains(uuid))
+                .collect(Collectors.toList());
+
+        this.userService.updatePreferredFeeds(userDetails.getUsername(), feedsUuid);
+        return ResponseEntity.noContent().build();
     }
 
 }
