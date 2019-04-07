@@ -12,12 +12,10 @@ import java.util.List;
 @Builder
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"sourceFeedUrl"})
 public class Feed {
 
-    @Id
-    @GeneratedValue
-    private Long id;
+    private String uuid;
 
     @NotEmpty
     private String title;
@@ -25,6 +23,11 @@ public class Feed {
     @NotEmpty
     @Column(unique = true, nullable = false)
     private String link;
+
+    @Id
+    @NotEmpty
+    @Column(unique = true, nullable = false)
+    private String sourceFeedUrl;
 
     @Column(length = 1024)
     private String copyright;
@@ -78,5 +81,7 @@ public class Feed {
     private String uri;
 
     private String webMaster;
+
+    private Date autoUpdatedDate;
 
 }

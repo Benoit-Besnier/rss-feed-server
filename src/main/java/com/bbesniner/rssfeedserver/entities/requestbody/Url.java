@@ -1,4 +1,4 @@
-package com.bbesniner.rssfeedserver.requestbodyentities;
+package com.bbesniner.rssfeedserver.entities.requestbody;
 
 import lombok.Data;
 

@@ -11,7 +11,7 @@ public class FeedTest {
 
     @Test
     public void shouldInstantiate() {
-        final Long id = 123456789L;
+        final String uuid = "3a8a2cba-b973-4a1e-9925-ee3957528688";
         final String link = "Michel";
         final String uri = "Michel";
         final String title = "Michel";
@@ -19,9 +19,9 @@ public class FeedTest {
         final Date publishedDate = Date.from(Instant.now());
 
         final Feed feed = Feed.builder()
-                .id(id)
+                .uuid(uuid)
                 .link(link)
-                .uri(uri)
+                .sourceFeedUrl(uri)
                 .title(title)
                 .description(description)
                 .publishedDate(publishedDate)
