@@ -1,4 +1,5 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11
 VOLUME /tmp
-ADD target/rss-feed-server.jar app.jar
+ADD target/rss-feed-server-DEVELOP.jar app.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","app.jar"]
+EXPOSE 8080

@@ -1,51 +1,77 @@
 package com.bbesniner.rssfeedserver.services;
 
-import com.bbesniner.rssfeedserver.hibernateentities.Feed;
+import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
+import com.bbesniner.rssfeedserver.entities.exceptions.ResourceNotFound;
+import com.bbesniner.rssfeedserver.entities.hibernate.Feed;
 import com.bbesniner.rssfeedserver.repositories.FeedRepository;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedService {
 
     private final FeedRepository feedRepository;
 
-    public Feed findOneByTitle(final String name) throws Exception {
-        return this.feedRepository.findOne(Example.of(new Feed(name, null))).orElseThrow(Exception::new);
+    private final ModelMapper modelMapper;
+
+    public List<Feed> findAll() {
+        return this.feedRepository.findAll();
     }
 
-    public void createFromUrl(final String url) throws FeedException {
+    public Feed findOneById(final String uuid) {
+        return this.feedRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ResourceNotFound(uuid, Feed.class));
+    }
+
+    public Feed createFromSourceUrl(final String url) throws CreateConflictException {
         final Feed feed = this.parseFeedFromTargetUrl(url);
 
-        this.feedRepository.save(feed);
+        if (!this.feedRepository.findBySourceFeedUrl(url).isPresent()) {
+            feed.setSourceFeedUrl(url);
+            feed.setUuid(this.generateNewUuid());
+
+            return this.feedRepository.save(feed);
+        } else {
+            throw new CreateConflictException("Cannot create " + feed.getLink() + " because it already exist.");
+        }
     }
 
-    public void updateFromUrl(final String url) throws FeedException {
-        final Feed feed = this.parseFeedFromTargetUrl(url);
+    private String generateNewUuid() {
+        String uuid = UUID.randomUUID().toString();
 
-        this.feedRepository.save(feed);
+        if (!this.feedRepository.findByUuid(uuid).isPresent())
+            return uuid;
+        else
+            return this.generateNewUuid();
     }
 
-    private Feed parseFeedFromTargetUrl(final String feedUrl) throws FeedException {
+    public void deleteByUuid(final String uuid) {
+        this.feedRepository.deleteByUuid(uuid);
+    }
+
+    private Feed parseFeedFromTargetUrl(final String feedUrl) {
         final SyndFeed parsedFeed = this.fetchFeed(feedUrl);
-        final Feed feed = new Feed();
 
-        feed.setTitle(parsedFeed.getTitle());
-        feed.setLink(parsedFeed.getLink());
-        feed.setCopyright(parsedFeed.getCopyright());
-        feed.setDescription(parsedFeed.getDescription());
+        return this.convertToDTO(parsedFeed);
+    }
 
-        return feed;
+    private Feed convertToDTO(final SyndFeed parsedFeed) {
+        return this.modelMapper.map(parsedFeed, Feed.class);
     }
 
     private SyndFeed fetchFeed(final String feedUrl) {
@@ -61,4 +87,31 @@ public class FeedService {
         });
     }
 
+    public void updateFeed(final Map.Entry<Feed, Feed> feedEntry) {
+        final Feed source = feedEntry.getKey();
+        final Feed toUpdate = feedEntry.getValue();
+
+        toUpdate.setUuid(source.getUuid());
+        toUpdate.setSourceFeedUrl(source.getSourceFeedUrl());
+        toUpdate.setAutoUpdatedDate(new Date());
+        this.feedRepository.save(toUpdate);
+    }
+
+    @Scheduled(fixedDelay = 300000)
+    public void updateFeed() {
+        final long startTime = System.currentTimeMillis();
+
+        final List<Feed> feedList = this.feedRepository.findAll();
+        final Map<Feed, Feed> feedMap = new HashMap<>();
+
+        for (final Feed feed : feedList) {
+            feedMap.put(feed, this.convertToDTO(this.fetchFeed(feed.getSourceFeedUrl())));
+        }
+
+        feedMap.entrySet().forEach(this::updateFeed);
+
+        log.info("New task executed at {} and take {} ms to be executed",
+                Date.from(Instant.ofEpochMilli(startTime)),
+                System.currentTimeMillis() - startTime);
+    }
 }
