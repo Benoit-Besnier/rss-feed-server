@@ -5,35 +5,29 @@ networks:
 
 services:
 
-#  postgres:
-#    image: "postgres:latest"
-#    container_name: "postgres"
-#    environment:
-#      - POSTGRES_PASSWORD=password
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_DB=mydb
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - "$HOME/docker/volumes/postgres:/var/lib/postgresql/data"
-#    networks:
-#      rss-feed-network:
-#        aliases:
-#          - server
+  postgres:
+    image: "postgres:latest"
+    container_name: "postgres"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - "$HOME/docker/volumes/postgres:/var/lib/postgresql/data"
 
   server:
     image: "rss-server"
     container_name: "server"
     build: .
-#    environment:
-#      - POSTGRES_PASSWORD=password
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_DB=mydb
-#    depends_on:
-#      - postgres
-#    networks:
-#      rss-feed-network:
-#        aliases:
-#          - postgres
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=mydb
+    depends_on:
+      - postgres
+    links:
+      - postgres
     ports:
       - 80:8080
