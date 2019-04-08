@@ -70,7 +70,7 @@ public class FeedService {
         return this.convertToDTO(parsedFeed);
     }
 
-    private Feed convertToDTO(SyndFeed parsedFeed) {
+    private Feed convertToDTO(final SyndFeed parsedFeed) {
         return this.modelMapper.map(parsedFeed, Feed.class);
     }
 

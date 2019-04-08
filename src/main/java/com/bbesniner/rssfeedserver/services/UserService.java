@@ -1,19 +1,18 @@
 package com.bbesniner.rssfeedserver.services;
 
 import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
+import com.bbesniner.rssfeedserver.entities.exceptions.ResourceNotFound;
 import com.bbesniner.rssfeedserver.entities.hibernate.User;
 import com.bbesniner.rssfeedserver.entities.requestbody.UserCredentials;
 import com.bbesniner.rssfeedserver.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +24,15 @@ public class UserService implements UserDetailsService {
 
     public List<User> findAllUsers() { return this.userRepository.findAll(); }
 
-    public Optional<User> findByUsername(final String username) {
-        return this.userRepository.findByUsername(username);
+    public User findByUsername(final String username) throws ResourceNotFound {
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFound(username, User.class));
     }
 
     @Override
-    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String username) throws ResourceNotFound {
         return this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User <" + username + "> cannot be found"));
+                .orElseThrow(() -> new ResourceNotFound(username, User.class));
     }
 
     public User createUser(final UserCredentials userCredentials) throws CreateConflictException {
@@ -47,5 +47,13 @@ public class UserService implements UserDetailsService {
         } else {
             throw new CreateConflictException("Cannot create " + user.getUsername() + " because it already exist.");
         }
+    }
+
+    public void updatePreferredFeeds(final String username, final List<String> preferredFeeds) {
+        final User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFound(username, User.class));
+
+        user.setPreferredFeedUuid(preferredFeeds);
+        this.userRepository.save(user);
     }
 }
