@@ -4,7 +4,8 @@ Student project
 
 ## Get started
 
-This API can be started with Maven or using IntelliJ.
+This API can be started with Maven (`mvn clean install`), with Docker Compose (`docker-compose up -d --build`) 
+or using IntelliJ built-in runner.
 
 ##### Some notes
 
