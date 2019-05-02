@@ -1,5 +1,6 @@
 package com.bbesniner.rssfeedserver.config;
 
+import com.bbesniner.rssfeedserver.entities.exceptions.CreateConflictException;
 import com.bbesniner.rssfeedserver.security.jwt.InvalidJwtAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,12 @@ public class RestExceptionHandler {
                                                    final WebRequest request) {
         log.debug("Handling InvalidJwtAuthenticationException : " + exception.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @ExceptionHandler(value = {CreateConflictException.class})
+    public ResponseEntity conflictOnCreate(final CreateConflictException exception, final WebRequest request) {
+        log.debug("Handling CreateConflictException : " + exception.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
 }

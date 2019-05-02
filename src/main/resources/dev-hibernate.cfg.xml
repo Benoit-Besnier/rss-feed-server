@@ -11,7 +11,7 @@
         <property name="show_sql">true</property>
         <property name="hbm2ddl.auto">create</property>
 
-        <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Category"/>
+        <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.FeedCategory"/>
         <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Enclosure"/>
         <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Entry"/>
         <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Feed"/>

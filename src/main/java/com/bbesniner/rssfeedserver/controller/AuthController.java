@@ -7,13 +7,13 @@ import com.bbesniner.rssfeedserver.entities.requestbody.UserCredentials;
 import com.bbesniner.rssfeedserver.security.jwt.JwtTokenProvider;
 import com.bbesniner.rssfeedserver.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping(AuthController.PATH)
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity signIn(@RequestBody final UserCredentials data) throws ResourceNotFound {
         final Map<String, String> model = new HashMap<>();
+        log.info("[DEBUG] - POST /auth/signin received {}", data);
 
         try {
             final String username = data.getUsername();
@@ -48,6 +50,7 @@ public class AuthController {
 
             model.put("username", username);
             model.put("token", token);
+            log.info("[DEBUG] - POST /auth/signin result to {}", model);
             return ResponseEntity.ok(model);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username/password supplied");
@@ -58,14 +61,8 @@ public class AuthController {
     public ResponseEntity createUser(@RequestBody final UserCredentials userCredentials,
                                      final HttpServletRequest request)
             throws CreateConflictException, URISyntaxException {
-        final User saved = this.userService.createUser(userCredentials);
-        final URI location = ServletUriComponentsBuilder
-                .fromContextPath(request)
-                .path(FeedController.PATH + "/{id}")
-                .buildAndExpand(saved.getId())
-                .toUri();
-
-        return ResponseEntity.created(location).build();
+        this.userService.createUser(userCredentials);
+        return ResponseEntity.created(URI.create(AuthController.PATH + "/register")).build();
     }
 
     @GetMapping

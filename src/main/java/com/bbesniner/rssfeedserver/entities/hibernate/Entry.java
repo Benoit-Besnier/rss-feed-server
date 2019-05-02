@@ -1,6 +1,8 @@
 package com.bbesniner.rssfeedserver.entities.hibernate;
 
 import lombok.*;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -26,15 +28,19 @@ public class Entry {
     @Column(unique = true, nullable = false)
     private String link;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @NotFound(action = NotFoundAction.IGNORE)
     private List<Person> authors;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Category> categories;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name = "fk_entries")
+    private List<EntryCategory> categories;
 
     private String comments;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @NotFound(action = NotFoundAction.IGNORE)
     private List<Person> contributors;
 
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,7 +51,8 @@ public class Entry {
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Enclosure> enclosures;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @NotFound(action = NotFoundAction.IGNORE)
     private List<Link> links;
 
 //    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

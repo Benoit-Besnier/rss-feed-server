@@ -22,7 +22,8 @@
         <property name="format_sql">true</property>
 
         <!-- Annotated entity classes -->
-        <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Category"/>
+        <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.FeedCategory"/>
+        <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.EntryCategory"/>
         <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Enclosure"/>
         <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Entry"/>
         <mapping class="com.bbesniner.rssfeedserver.entities.hibernate.Feed"/>
