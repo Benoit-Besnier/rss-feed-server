@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping(FeedController.PATH)
 @RequiredArgsConstructor
