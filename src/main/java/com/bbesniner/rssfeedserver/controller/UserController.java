@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping(UserController.PATH)
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity currentUser(@AuthenticationPrincipal final UserDetails userDetails) throws ResourceNotFound {
         final Map<Object, Object> userInformation = new HashMap<>();
-        log.info("[DEBUG] - POST /users/me received {}", userDetails);
+        log.info("[DEBUG] - GET /users/me received {}", userDetails);
         final User user = this.userService.findByUsername(userDetails.getUsername());
 
         userInformation.put("username", userDetails.getUsername());

@@ -23,9 +23,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+//    @Bean
+//    CorsFilter corsFilter() {
+//        return new CorsFilter();
+//    }
+
+
     @Override
     protected void configure(final HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+//                .addFilterBefore(this.corsFilter(), SessionManagementFilter.class)
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -40,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     //.antMatchers(HttpMethod.DELETE, "/feeds/**").hasRole("ADMIN")
 //                  .antMatchers(HttpMethod.GET, "/feeds/whatever/**").permitAll()
                     .anyRequest().authenticated()
+                .and().cors()
                 .and()
                     .apply(new JwtConfigurer(this.jwtTokenProvider));
     }
