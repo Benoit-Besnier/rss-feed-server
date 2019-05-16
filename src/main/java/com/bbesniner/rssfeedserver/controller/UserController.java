@@ -7,6 +7,7 @@ import com.bbesniner.rssfeedserver.entities.requestbody.PreferredFeeds;
 import com.bbesniner.rssfeedserver.services.FeedService;
 import com.bbesniner.rssfeedserver.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping(UserController.PATH)
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity currentUser(@AuthenticationPrincipal final UserDetails userDetails) throws ResourceNotFound {
         final Map<Object, Object> userInformation = new HashMap<>();
+        log.info("[DEBUG] - POST /users/me received {}", userDetails);
         final User user = this.userService.findByUsername(userDetails.getUsername());
 
         userInformation.put("username", userDetails.getUsername());
